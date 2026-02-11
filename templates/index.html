@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Feliz San Valentín Mi Amor ❤️ Te Amo Mucho Mi Pollita Hermosa</title>
+
+<link rel="stylesheet" href="/static/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<audio id="bgMusic" loop>
+    <source src="/static/music/cancion.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicBtn">🎵</button>
+
+<body>
+
+<div class="gallery-container">
+
+    <!-- Imagen única que cambia -->
+    <img class="gallery-img" src="/static/photos/Juntos1.jpeg">
+
+    <!-- Mensaje -->
+    <div class="mensaje" id="mensaje"></div>
+
+    <!-- Indicadores -->
+    <div class="indicador" id="indicador"></div>
+
+</div>
+
+<!-- Corazones -->
+<div class="hearts" id="hearts"></div>
+<!-- Sparkles -->
+<div class="sparkles" id="sparkles"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // ---- IMAGENES ----
+    const images = [
+        "/static/photos/Juntos1.jpeg",
+        "/static/photos/Juntos2.jpeg",
+        "/static/photos/Juntos3.jpeg",
+        "/static/photos/Juntos4.jpeg",
+        "/static/photos/Juntos5.jpeg",
+        "/static/photos/Juntos6.jpeg"
+    ];
+
+    // ---- MENSAJES ----
+    const mensajes = [
+        "Eres la coincidencia más hermosa que tuvo mi vida ❤️",
+        "Cada momento contigo es mi lugar favorito 💕",
+        "Gracias por existir y caminar conmigo ✨"
+    ];
+
+    let current = 0;
+
+    const img = document.querySelector(".gallery-img");
+    const mensaje = document.getElementById("mensaje");
+    const indicador = document.getElementById("indicador");
+
+    // ---- CREAR INDICADORES ----
+    images.forEach((_, i) => {
+        let dot = document.createElement("span");
+        if (i === 0) dot.classList.add("activo");
+        indicador.appendChild(dot);
+    });
+
+    // ---- ACTUALIZAR MENSAJE + PUNTOS ----
+    function actualizarVista() {
+
+        // fade out
+        mensaje.classList.add("fade-out");
+
+        setTimeout(() => {
+            mensaje.innerText = mensajes[current];
+
+            // fade in
+            mensaje.classList.remove("fade-out");
+        }, 600);
+
+        document.querySelectorAll(".indicador span")
+            .forEach((d, i) => d.classList.toggle("activo", i === current));
+    }
+
+    actualizarVista();
+
+    // ---- CAMBIO DE IMAGEN CON ZOOM ----
+    function changeImage(newSrc) {
+        img.classList.add("zoom-enter");
+
+        setTimeout(() => {
+            img.src = newSrc;
+
+            img.classList.remove("zoom-enter");
+            img.classList.add("zoom-active");
+
+            setTimeout(() => {
+                img.classList.remove("zoom-active");
+            }, 800);
+
+        }, 50);
+    }
+
+    function nextImage() {
+        current = (current + 1) % images.length;
+        changeImage(images[current]);
+        actualizarVista();
+    }
+
+    function prevImage() {
+        current = (current - 1 + images.length) % images.length;
+        changeImage(images[current]);
+        actualizarVista();
+    }
+
+    // ---- SWIPE CON ARRASTRE (tipo Instagram) ----
+
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+
+    function getX(e) {
+        return e.touches ? e.touches[0].clientX : e.clientX;
+    }
+
+    // inicio del arrastre
+    function startDrag(e) {
+        isDragging = true;
+        startX = getX(e);
+        img.style.transition = "none";
+    }
+
+    // mover mientras arrastra
+    function drag(e) {
+        if (!isDragging) return;
+
+        currentX = getX(e);
+        const diff = currentX - startX;
+
+        img.style.transform = `translateX(${diff}px)`;
+    }
+
+    // termina arrastre
+    function endDrag(e) {
+        if (!isDragging) return;
+
+        isDragging = false;
+        img.style.transition = "transform 0.3s ease";
+
+        const diff = currentX - startX;
+        const threshold = 100; // distancia necesaria para cambiar imagen
+
+        if (diff < -threshold) {
+            // izquierda → siguiente
+            img.style.transform = "translateX(-100%)";
+
+            setTimeout(() => {
+                nextImage();
+                img.style.transition = "none";
+                img.style.transform = "translateX(100%)";
+
+                setTimeout(() => {
+                    img.style.transition = "transform 0.3s ease";
+                    img.style.transform = "translateX(0)";
+                }, 50);
+
+            }, 200);
+
+        } else if (diff > threshold) {
+            // derecha → anterior
+            img.style.transform = "translateX(100%)";
+
+            setTimeout(() => {
+                prevImage();
+                img.style.transition = "none";
+                img.style.transform = "translateX(-100%)";
+
+                setTimeout(() => {
+                    img.style.transition = "transform 0.3s ease";
+                    img.style.transform = "translateX(0)";
+                }, 50);
+
+            }, 200);
+
+        } else {
+            // no arrastró suficiente → regresa
+            img.style.transform = "translateX(0)";
+        }
+    }
+
+    // eventos móvil
+    img.addEventListener("touchstart", startDrag);
+    img.addEventListener("touchmove", drag);
+    img.addEventListener("touchend", endDrag);
+
+    // eventos mouse PC
+    img.addEventListener("mousedown", startDrag);
+    img.addEventListener("mousemove", drag);
+    img.addEventListener("mouseup", endDrag);
+    img.addEventListener("mouseleave", endDrag);
+
+    // ---- CORAZONES FLOTANDO ----
+
+    const heartsContainer = document.getElementById("hearts");
+
+    function createHeart() {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.innerHTML = "❤️";
+
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.fontSize = (15 + Math.random() * 25) + "px";
+        heart.style.animationDuration = (3 + Math.random() * 4) + "s";
+
+        heartsContainer.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 7000);
+    }
+
+    // crear corazones constantemente
+    setInterval(createHeart, 500);
+
+    // ---- MUSICA ----
+
+    const music = document.getElementById("bgMusic");
+    const musicBtn = document.getElementById("musicBtn");
+
+    let playing = false;
+
+    musicBtn.addEventListener("click", () => {
+        if (playing) {
+            music.pause();
+            musicBtn.innerText = "🎵";
+        } else {
+            music.play();
+            musicBtn.innerText = "⏸️";
+        }
+        playing = !playing;
+    });
+
+});
+</script>
+
+</body>
+</html>
