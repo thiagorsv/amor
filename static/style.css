@@ -227,4 +227,29 @@ body {
     z-index: 9999;   /* ← CLAVE */
 }
 
+.flotante {
+    position: fixed;
+    width: 40px;
+    pointer-events: none;
+    z-index: 1;
+
+    animation: flotar 5s linear forwards;
+}
+
+@keyframes flotar {
+    0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-120vh) scale(1.2);
+        opacity: 0;
+    }
+}
+
 

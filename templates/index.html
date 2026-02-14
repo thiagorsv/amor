@@ -261,6 +261,27 @@ document.addEventListener("DOMContentLoaded", () => {
         playing = !playing;
     });
 
+    // Agregar dibujo
+    function crearFigura() {
+
+        const img = document.createElement("img");
+
+        img.src = "/static/photos/novios.png"; // tu imagen
+        img.classList.add("flotante");
+
+        // posición horizontal aleatoria
+        img.style.left = Math.random() * window.innerWidth + "px";
+
+        // tamaño aleatorio
+        img.style.width = (30 + Math.random()*40) + "px";
+
+        document.body.appendChild(img);
+
+        // eliminar después de animación
+        setTimeout(() => img.remove(), 5000);
+    }
+    setInterval(crearFigura, 800);
+
 });
 </script>
 
